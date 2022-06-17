@@ -1,0 +1,27 @@
+{
+    "name": "ogenes/exceler",
+    "description": "excel表格导入导出工具",
+    "type": "libary",
+    "license": "MIT",
+    "keywords": [
+        "phpoffice",
+        "phpspreadsheet",
+        "excel"
+    ],
+    "require": {
+        "php": "^7.0",
+        "phpoffice/phpspreadsheet": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ogenes\\Exceler\\": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "ogenes",
+            "email": "ogenes.yi@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
