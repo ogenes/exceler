@@ -1,6 +1,6 @@
 <?php
 /**
- * User: john <john.yi@55haitao.com>
+ * User: ogenes<ogenes.yi@gmail.com>
  * Date: 2022/6/17
  */
 
@@ -8,14 +8,13 @@ namespace Ogenes\Exceler;
 
 use Exception;
 use InvalidArgumentException;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Chart\Properties;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class ExcelClient
+class ExcelClient extends Base
 {
     public function read(string $filePath, array $config = null, $ext = null): array
     {
@@ -97,27 +96,23 @@ class ExcelClient
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function export(string $filename, array $config, array $data, string $filepath = '/tmp'): string
+    public function export(string $filename, array $config, array $data, string $filepath = './'): string
     {
         if (empty($config)) {
             throw new InvalidArgumentException("错误的excel配置信息'");
         }
         $excel = new Spreadsheet();
-        //config中的sheet名和data中数组的对应关系
         $sheetIndexMap = [];
         $sheetIndex = 0;
         foreach ($config as $sheetName => $sheetConfig) {
             $excel->setActiveSheetIndex($sheetIndex);
             $sheet = $excel->getActiveSheet();
-            //设置sheet名
             $sheet->setTitle($sheetName);
             $sheetIndexMap[$sheetIndex] = $sheetName;
             
             $columnIndex = 'A';
             foreach ($sheetConfig as $columnItem) {
-                //设置列名
                 $sheet->setCellValue($columnIndex . '1', $columnItem['columnName']);
-                //表头样式
                 $styleArray = [
                     'borders' => [
                         'outline' => [
@@ -132,7 +127,7 @@ class ExcelClient
                         'size' => 8
                     ],
                     'alignment' => [
-                        'horizontal' => $columnItem['align'] ?? Alignment::HORIZONTAL_CENTER,
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
                         'vertical' => Alignment::VERTICAL_CENTER,
                         'wrapText' => false,
                     ]
@@ -154,7 +149,6 @@ class ExcelClient
             $excel->setActiveSheetIndex($sheetIndex);
             $sheet = $excel->getActiveSheet();
             if (isset($sheetIndexMap[$sheetIndex])) {
-                //获取数组对应的config
                 $configKey = $sheetIndexMap[$sheetIndex];
                 $sheetConfig = $config[$configKey];
                 $rowIndex = 2;
@@ -164,53 +158,31 @@ class ExcelClient
                     $columnIndex = 'A';
                     foreach ($sheetConfig as $item) {
                         $text = array_key_exists($item['bindKey'], $row) ? $row[$item['bindKey']] : '未找到的bindKey';
-                        if (isset($item['isPicture']) && $item['isPicture']) {
-                            $tmpPath = $imgPath[md5($text)] ?? '';
-                            if ($tmpPath) {
-                                $img = new Drawing();
-                                $img->setName('Logo');
-                                $img->setDescription('Logo');
-                                $img->setOffsetX(10);
-                                $img->setOffsetY(10);
-                                $img->setPath($tmpPath);
-                                $img->setWidth(80);
-                                $img->setHeight(80);
-                                $img->setCoordinates($columnIndex . $rowIndex);
-                                $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($text);
-                                $sheet->getRowDimension($rowIndex)->setRowHeight(80);
-                                $img->setWorksheet($sheet);
-                                $styleArray['alignment']['horizontal'] = 'center';
-                            } else {
-                                $sheet->setCellValueExplicit($columnIndex . $rowIndex, $text, DataType::TYPE_STRING);
-                            }
-                        } else {
-                            $sheet->setCellValue($columnIndex . $rowIndex, $text);
-                            $setWrapText = $item['setWrapText'] ?? false;
-                            $styleArray = [
-                                'borders' => [
-                                    'outline' => [
-                                        'borderStyle' => Border::BORDER_THIN,
-                                        'color' => ['argb' => '00595959'],
-                                    ],
-                                ],
-                                'font' => [
-                                    'name' => '微软雅黑',
+                        $sheet->setCellValue($columnIndex . $rowIndex, $text);
+                        $setWrapText = $item['setWrapText'] ?? false;
+                        $styleArray = [
+                            'borders' => [
+                                'outline' => [
+                                    'borderStyle' => Border::BORDER_THIN,
                                     'color' => ['argb' => '00595959'],
-                                    'size' => 9
                                 ],
-                                'numberFormat' => [
-                                    'formatCode' => $item['format'] ?? 'General',
-                                ],
-                                'alignment' => [
-                                    'horizontal' => $item['align'] ?? Alignment::HORIZONTAL_CENTER,
-                                    'vertical' => Alignment::VERTICAL_CENTER,
-                                ]
-                            ];
-                            $setWrapText && $styleArray['alignment']['wrapText'] = true;
-                            $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
-                            isset($item['height']) && $sheet->getRowDimension($rowIndex)->setRowHeight($item['height']);
-                            
-                        }
+                            ],
+                            'font' => [
+                                'name' => '微软雅黑',
+                                'color' => ['argb' => '00595959'],
+                                'size' => 9
+                            ],
+                            'numberFormat' => [
+                                'formatCode' => $item['format'] ?? Properties::FORMAT_CODE_GENERAL,
+                            ],
+                            'alignment' => [
+                                'horizontal' => $item['align'] ?? Alignment::HORIZONTAL_LEFT,
+                                'vertical' => Alignment::VERTICAL_CENTER,
+                            ]
+                        ];
+                        $setWrapText && $styleArray['alignment']['wrapText'] = true;
+                        $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
+                        isset($item['height']) && $sheet->getRowDimension($rowIndex)->setRowHeight($item['height']);
                         $maxColumn = $columnIndex;
                         $columnIndex++;
                     }

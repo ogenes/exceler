@@ -10,7 +10,8 @@
     ],
     "require": {
         "php": "^7.0",
-        "phpoffice/phpspreadsheet": "^1.23"
+        "phpoffice/phpspreadsheet": "^1.23",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
