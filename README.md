@@ -6,7 +6,7 @@
 composer require ogenes/exceler
 ```
 
-## 读取excel文件
+## 简单读取
 ```php
 function run(): array
 {
@@ -21,30 +21,36 @@ function run(): array
 }
 ```
 
-## 导出excel文件
+## 简单导出
 ```php
 
-function run(): string
+public function run(): string
 {
     $data['sheet1'] = [
-        [
-            'goodsName' => '半裙',
-            'price' => 1490,
-            'actualStock' => 2,
-        ],
-        [
-            'goodsName' => '半裙',
-            'price' => 1590,
-            'actualStock' => 1,
-        ]
+        ['goodsName' => '半裙', 'price' => 1490, 'actualStock' => 2,],
+        ['goodsName' => '半裙', 'price' => 1590, 'actualStock' => 1,]
     ];
     
-    $config['sheet'] = [
-        ['bindKey' => 'goodsName', 'columnName' => '商品名称', 'width' => 30],
-        ['bindKey' => 'price', 'columnName' => '售价', 'align' => 'right', 'format' => Properties::FORMAT_CODE_ACCOUNTING],
-        ['bindKey' => 'actualStock', 'columnName' => '实际库存', 'align' => 'right'],
+    $config['sheet1'] = [
+        ['bindKey' => 'goodsName', 'columnName' => '商品名称'],
+        ['bindKey' => 'price', 'columnName' => '售价'],
+        ['bindKey' => 'actualStock', 'columnName' => '实际库存'],
     ];
-    return ExcelClient::getInstance()->export('newfile', $config, $data, __DIR__ . '/file/');
+    return ExportClient::getInstance()
+        ->setFilepath(__DIR__ . '/file/' . date('Y/m/d/'))
+        ->setFilename('file' . date('His'))
+        ->setData($data)
+        ->setConfig($config)
+        ->export();
 }
 
+```
+
+## 输出到浏览器
+```php
+    ExportClient::getInstance()
+        ->setFilename('file' . date('His'))
+        ->setData($data)
+        ->setConfig($config)
+        ->output();
 ```

@@ -1,7 +1,8 @@
 <?php
 
-use Ogenes\Exceler\ExcelClient;
+use Ogenes\Exceler\ExportClient;
 use PhpOffice\PhpSpreadsheet\Chart\Properties;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 require "vendor/autoload.php";
 
@@ -11,29 +12,36 @@ require "vendor/autoload.php";
  */
 class ExportExample
 {
+    
+    /**
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
     public function run(): string
     {
         $data['sheet1'] = [
-            [
-                'goodsName' => '半裙',
-                'price' => 1490,
-                'actualStock' => 2,
-            ],
-            [
-                'goodsName' => '半裙',
-                'price' => 1590,
-                'actualStock' => 1,
-            ]
+            ['goodsName' => '半裙', 'price' => 1490, 'actualStock' => 2,],
+            ['goodsName' => '半裙', 'price' => 1590, 'actualStock' => 1,]
         ];
         
-        $config['sheet'] = [
-            ['bindKey' => 'goodsName', 'columnName' => '商品名称', 'width' => 30],
-            ['bindKey' => 'price', 'columnName' => '售价', 'align' => 'right', 'format' => Properties::FORMAT_CODE_ACCOUNTING],
-            ['bindKey' => 'actualStock', 'columnName' => '实际库存', 'align' => 'right'],
+        $config['sheet1'] = [
+            ['bindKey' => 'goodsName', 'columnName' => '商品名称'],
+            ['bindKey' => 'price', 'columnName' => '售价', 'horizontal' => Alignment::HORIZONTAL_RIGHT, 'format' => Properties::FORMAT_CODE_ACCOUNTING],
+            ['bindKey' => 'actualStock', 'columnName' => '实际库存', 'horizontal' => Alignment::HORIZONTAL_RIGHT, 'width' => 15],
         ];
-        return ExcelClient::getInstance()->export('newfile', $config, $data, __DIR__ . '/file/');
+        return ExportClient::getInstance()
+            ->setFilepath(__DIR__ . '/file/' . date('Y/m/d/'))
+            ->setFilename('file' . date('His'))
+            ->setData($data)
+            ->setConfig($config)
+            ->export();
     }
 }
 
-$filepath = (new ExportExample())->run();
-print_r($filepath);
+try {
+    $filepath = (new ExportExample())->run();
+    print_r($filepath);
+} catch (\Exception $e) {
+    print_r($e->getMessage());
+}
+echo PHP_EOL;
