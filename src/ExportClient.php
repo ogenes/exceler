@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 class ExportClient extends ExportService
 {
@@ -228,7 +229,21 @@ class ExportClient extends ExportService
                         } else {
                             $text = '未找到的bindKey';
                         }
-                        $sheet->setCellValue($columnIndex . $rowIndex, $text);
+                        if (isset($item['drawing'])) {
+                            $img = new Drawing();
+                            $img->setName($item['drawing']['name'] ?? '');
+                            $img->setDescription('');
+                            $img->setOffsetX($item['drawing']['x'] ?? 10);
+                            $img->setOffsetY($item['drawing']['y'] ?? 10);
+                            $img->setPath($text);
+                            $img->setWidth($item['drawing']['w'] ?? 80);
+                            $img->setHeight($item['drawing']['h'] ?? 80);
+                            $img->setCoordinates($columnIndex . $rowIndex);
+                            $sheet->getRowDimension($rowIndex)->setRowHeight($item['drawing']['h'] ?? 80);
+                            $img->setWorksheet($sheet);
+                        } else {
+                            $sheet->setCellValue($columnIndex . $rowIndex, $text);
+                        }
                         $styleArray = $this->getContentStyle($item, $row['cellStyle'] ?? []);
                         $styleArray && $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
                         $hyperlink && $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($hyperlink);
