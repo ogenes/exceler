@@ -7,12 +7,9 @@
 namespace Ogenes\Exceler;
 
 use InvalidArgumentException;
-use PhpOffice\PhpSpreadsheet\Chart\Properties;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class ExportClient extends ExportService
 {
@@ -167,9 +164,10 @@ class ExportClient extends ExportService
             foreach ($sheetConfig as $columnItem) {
                 $sheet->setCellValue($columnIndex . '1', $columnItem['columnName']);
                 $styleArray = [];
-                $this->headerFont && $styleArray['font'] = $this->font;
-                $this->headerBorder && $styleArray['borders'] = $this->headerBorder;
+                $this->headerFont && $styleArray['font'] = $this->headerFont;
+                $this->headerBorders && $styleArray['borders'] = $this->headerBorders;
                 $this->headerAlignment && $styleArray['alignment'] = $this->headerAlignment;
+                $this->headerFill && $styleArray['fill'] = $this->headerFill;
                 $styleArray && $sheet->getStyle($columnIndex . '1')->applyFromArray($styleArray);
                 $cellLength = $columnItem['width'] ?? $this->width;
                 $sheet->getColumnDimension($columnIndex)->setWidth($cellLength, $this->unit);
@@ -206,20 +204,42 @@ class ExportClient extends ExportService
                 $rowIndex = 2;
                 $maxColumn = 'A';
                 $maxRow = 2;
+                $columnMap = [];
                 foreach ($sheetData as $row) {
                     $columnIndex = 'A';
                     foreach ($sheetConfig as $item) {
-                        $text = array_key_exists($item['bindKey'], $row) ? $row[$item['bindKey']] : '未找到的bindKey';
+                        $hyperlink = '';
+                        if (array_key_exists($item['bindKey'], $row)) {
+                            $text = $row[$item['bindKey']];
+                            if (is_array($text)) {
+                                $hyperlink = $text['hyperlink'] ?? '';
+                                $text = $text['text'] ?? '';
+                            }
+                        } elseif (strpos($item['bindKey'], '=') !== false) {
+                            $text = str_replace(
+                                array_map(static function ($key) {
+                                    return "{{$key}}";
+                                }, array_keys($columnMap)),
+                                array_map(static function ($val) use ($rowIndex) {
+                                    return "{$val}{$rowIndex}";
+                                }, $columnMap),
+                                $item['bindKey']
+                            );
+                        } else {
+                            $text = '未找到的bindKey';
+                        }
                         $sheet->setCellValue($columnIndex . $rowIndex, $text);
-                        $styleArray = $this->getContentStyle($item);
+                        $styleArray = $this->getContentStyle($item, $row['cellStyle'] ?? []);
                         $styleArray && $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
+                        $hyperlink && $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($hyperlink);
                         $maxColumn = $columnIndex;
+                        $columnMap[$item['bindKey']] = $columnIndex;
                         $columnIndex++;
                     }
                     $maxRow = $rowIndex;
                     $rowIndex++;
                 }
-                $sheet->setAutoFilter("A1:{$maxColumn}{$maxRow}");
+//                $sheet->setAutoFilter("A1:{$maxColumn}{$maxRow}");
                 $sheetIndex++;
             }
         }
@@ -234,27 +254,30 @@ class ExportClient extends ExportService
      * @author: ogenes<ogenes.yi@gmail.com>
      * @date: 2022/6/18
      */
-    protected function getContentStyle(array $item): array
+    protected function getContentStyle(array $item, array $columnStyle): array
     {
-        $styleArray = [];
-        $this->font && $styleArray['font'] = $this->font;
-        $this->border && $styleArray['borders'] = $this->border;
+        $styleArray = [
+            'font' => $this->font,
+            'borders' => $this->borders,
+            'alignment' => $this->alignment,
+            'fill' => $this->fill,
+            'numberFormat' => ['formatCode' => $this->formatCode],
+        ];
         
-        if (!empty($item['horizontal'])) {
-            $styleArray['alignment']['horizontal'] = $item['horizontal'];
-        } elseif (!empty($this->alignment['horizontal'])) {
-            $styleArray['alignment']['horizontal'] = $this->alignment['horizontal'];
+        $existStyle = $item['style'] ?? [];
+        $fields = [
+            'font',
+            'borders',
+            'alignment',
+            'fill',
+        ];
+        foreach ($fields as $field) {
+            !empty($existStyle[$field]) && $styleArray[$field] = array_merge($styleArray[$field], $existStyle[$field]);
+            $cellStyle = $columnStyle[$item['bindKey']] ?? ($columnStyle['*'] ?? []);
+            !empty($cellStyle[$field]) && $styleArray[$field] = array_merge($styleArray[$field], $cellStyle[$field]);
         }
-        if (!empty($item['vertical'])) {
-            $styleArray['alignment']['vertical'] = $item['vertical'];
-        } elseif (!empty($this->alignment['vertical'])) {
-            $styleArray['alignment']['vertical'] = $this->alignment['vertical'];
-        }
-        
         if (!empty($item['format'])) {
             $styleArray['numberFormat']['formatCode'] = $item['format'];
-        } elseif (!empty($this->formatCode)) {
-            $styleArray['numberFormat']['formatCode'] = $this->formatCode;
         }
         return $styleArray;
     }

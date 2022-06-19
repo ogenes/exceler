@@ -25,8 +25,8 @@ class ExportService extends Base
     /**
      * @var array[]
      */
-    protected $headerBorder = [
-        'outline' => [
+    protected $headerBorders = [
+        'allBorders' => [
             'borderStyle' => Border::BORDER_THIN,
             'color' => ['argb' => '00595959'],
         ],
@@ -43,6 +43,11 @@ class ExportService extends Base
     /**
      * @var array
      */
+    protected $headerFill = [];
+    
+    /**
+     * @var array
+     */
     protected $font = [
         'name' => '微软雅黑',
         'color' => ['argb' => '00595959'],
@@ -52,8 +57,8 @@ class ExportService extends Base
     /**
      * @var array[]
      */
-    protected $border = [
-        'outline' => [
+    protected $borders = [
+        'allBorders' => [
             'borderStyle' => Border::BORDER_THIN,
             'color' => ['argb' => '00595959'],
         ],
@@ -67,6 +72,11 @@ class ExportService extends Base
         'vertical' => Alignment::VERTICAL_CENTER,
         'wrapText' => false,
     ];
+    
+    /**
+     * @var array
+     */
+    protected $fill = [];
     
     /**
      * @var string
@@ -108,28 +118,28 @@ class ExportService extends Base
      */
     public function setStyleFont(array $font): self
     {
-        $this->font = array_merge($font, $this->font);
+        $this->font = array_merge($this->font, $font);
         return $this;
     }
     
     /**
      * @desc 设置边框
      * [
-     * 'outline' => [
+     * 'allBorders' => [
      * 'borderStyle' => Border::BORDER_THIN,
      * 'color' => ['argb' => '00595959'],
      * ],
      * ]
      *
-     * @param array $border
+     * @param array $borders
      * @return $this
      *
      * @author: ogenes <ogenes.yi@gmail.com>
      * @date: 2022/6/18
      */
-    public function setStyleBorder(array $border): self
+    public function setStyleBorders(array $borders): self
     {
-        $this->border = array_merge($border, $this->border);
+        $this->borders = array_merge($this->borders, $borders);
         return $this;
     }
     
@@ -149,7 +159,22 @@ class ExportService extends Base
      */
     public function setStyleAlignment(array $alignment): self
     {
-        $this->alignment = array_merge($alignment, $this->alignment);
+        $this->alignment = array_merge($this->alignment, $alignment);
+        return $this;
+    }
+    
+    /**
+     * @desc 设置内容区填充
+     *
+     * @param array $fill
+     * @return $this
+     *
+     * @author: ogenes <ogenes.yi@gmail.com>
+     * @date: 2022/6/19
+     */
+    public function setStyleFill(array $fill): self
+    {
+        $this->fill = array_merge($this->fill, $fill);
         return $this;
     }
     
@@ -216,28 +241,28 @@ class ExportService extends Base
      */
     public function setStyleHeaderFont(array $font): self
     {
-        $this->headerFont = array_merge($font, $this->headerFont);
+        $this->headerFont = array_merge($this->headerFont, $font);
         return $this;
     }
     
     /**
      * @desc 设置表头边框
      * [
-     * 'outline' => [
+     * 'allBorders' => [
      * 'borderStyle' => Border::BORDER_THIN, //边框，参考 PhpOffice\PhpSpreadsheet\Style\Border
      * 'color' => ['argb' => '00595959'], // 颜色
      * ],
      * ]
      *
-     * @param array $border
+     * @param array $borders
      * @return $this
      *
      * @author: ogenes <ogenes.yi@gmail.com>
      * @date: 2022/6/18
      */
-    public function setStyleHeaderBorder(array $border): self
+    public function setStyleHeaderBorders(array $borders): self
     {
-        $this->headerBorder = array_merge($border, $this->headerBorder);
+        $this->headerBorders = array_merge($this->headerBorders, $borders);
         return $this;
     }
     
@@ -258,7 +283,22 @@ class ExportService extends Base
      */
     public function setStyleHeaderAlignment(array $alignment): self
     {
-        $this->headerAlignment = array_merge($alignment, $this->headerAlignment);
+        $this->headerAlignment = array_merge($this->headerAlignment, $alignment);
+        return $this;
+    }
+    
+    /**
+     * @desc 设置表头填充
+     *
+     * @param array $fill
+     * @return $this
+     *
+     * @author: ogenes <ogenes.yi@gmail.com>
+     * @date: 2022/6/19
+     */
+    public function setStyleHeaderFill(array $fill): self
+    {
+        $this->headerFill = array_merge($this->headerFill, $fill);
         return $this;
     }
     
