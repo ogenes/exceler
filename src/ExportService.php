@@ -84,6 +84,16 @@ class ExportService extends Base
     protected $formatCode = Properties::FORMAT_CODE_GENERAL;
     
     /**
+     * @var bool
+     */
+    protected $freezeHeader = false;
+    
+    /**
+     * @var bool
+     */
+    protected $autoFilter = false;
+    
+    /**
      * @var int
      */
     protected $width = 30;
@@ -299,6 +309,36 @@ class ExportService extends Base
     public function setStyleHeaderFill(array $fill): self
     {
         $this->headerFill = array_merge($this->headerFill, $fill);
+        return $this;
+    }
+    
+    /**
+     * @desc 是否冻结首行
+     *
+     * @param bool $freeze
+     * @return $this
+     *
+     * @author: ogenes <ogenes.yi@gmail.com>
+     * @date: 2022/6/20
+     */
+    public function setFreezeHeader(bool $freeze): self
+    {
+        $this->freezeHeader = $freeze;
+        return $this;
+    }
+    
+    /**
+     * @desc 自动筛选
+     *
+     * @param bool $autoFilter
+     * @return $this
+     *
+     * @author: ogenes <ogenes.yi@gmail.com>
+     * @date: 2022/6/20
+     */
+    public function setAutoFilter(bool $autoFilter): self
+    {
+        $this->autoFilter = $autoFilter;
         return $this;
     }
     

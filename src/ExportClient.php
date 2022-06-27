@@ -172,7 +172,6 @@ class ExportClient extends ExportService
                 $styleArray && $sheet->getStyle($columnIndex . '1')->applyFromArray($styleArray);
                 $cellLength = $columnItem['width'] ?? $this->width;
                 $sheet->getColumnDimension($columnIndex)->setWidth($cellLength, $this->unit);
-                
                 $columnIndex++;
             }
             $excel->createSheet();
@@ -199,6 +198,7 @@ class ExportClient extends ExportService
         foreach ($data as $sheetData) {
             $excel->setActiveSheetIndex($sheetIndex);
             $sheet = $excel->getActiveSheet();
+            $this->freezeHeader && $sheet->freezePane('A2');
             if (isset($sheetIndexMap[$sheetIndex])) {
                 $configKey = $sheetIndexMap[$sheetIndex];
                 $sheetConfig = $config[$configKey];
@@ -210,10 +210,12 @@ class ExportClient extends ExportService
                     $columnIndex = 'A';
                     foreach ($sheetConfig as $item) {
                         $hyperlink = '';
+                        $comment = '';
                         if (array_key_exists($item['bindKey'], $row)) {
                             $text = $row[$item['bindKey']];
                             if (is_array($text)) {
                                 $hyperlink = $text['hyperlink'] ?? '';
+                                $comment = $text['comment'] ?? '';
                                 $text = $text['text'] ?? '';
                             }
                         } elseif (strpos($item['bindKey'], '=') !== false) {
@@ -247,6 +249,7 @@ class ExportClient extends ExportService
                         $styleArray = $this->getContentStyle($item, $row['cellStyle'] ?? []);
                         $styleArray && $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
                         $hyperlink && $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($hyperlink);
+                        $comment && $sheet->getComment($columnIndex . $rowIndex)->getText()->createTextRun($comment);
                         $maxColumn = $columnIndex;
                         $columnMap[$item['bindKey']] = $columnIndex;
                         $columnIndex++;
@@ -254,7 +257,7 @@ class ExportClient extends ExportService
                     $maxRow = $rowIndex;
                     $rowIndex++;
                 }
-//                $sheet->setAutoFilter("A1:{$maxColumn}{$maxRow}");
+                $this->autoFilter && $sheet->setAutoFilter("A1:{$maxColumn}{$maxRow}");
                 $sheetIndex++;
             }
         }
