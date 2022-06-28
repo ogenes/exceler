@@ -169,6 +169,9 @@ class ExportClient extends ExportService
                 $this->headerBorders && $styleArray['borders'] = $this->headerBorders;
                 $this->headerAlignment && $styleArray['alignment'] = $this->headerAlignment;
                 $this->headerFill && $styleArray['fill'] = $this->headerFill;
+                if(!empty($columnItem['align'])) {
+                    $styleArray['alignment']['horizontal'] = $columnItem['align'];
+                }
                 $styleArray && $sheet->getStyle($columnIndex . '1')->applyFromArray($styleArray);
                 $cellLength = $columnItem['width'] ?? $this->width;
                 $sheet->getColumnDimension($columnIndex)->setWidth($cellLength, $this->unit);
@@ -247,6 +250,9 @@ class ExportClient extends ExportService
                             $sheet->setCellValue($columnIndex . $rowIndex, $text);
                         }
                         $styleArray = $this->getContentStyle($item, $row['cellStyle'] ?? []);
+                        if(!empty($columnItem['align'])) {
+                            $styleArray['alignment']['horizontal'] = $columnItem['align'];
+                        }
                         $styleArray && $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
                         $hyperlink && $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($hyperlink);
                         $comment && $sheet->getComment($columnIndex . $rowIndex)->getText()->createTextRun($comment);
