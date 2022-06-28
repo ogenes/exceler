@@ -250,8 +250,8 @@ class ExportClient extends ExportService
                             $sheet->setCellValue($columnIndex . $rowIndex, $text);
                         }
                         $styleArray = $this->getContentStyle($item, $row['cellStyle'] ?? []);
-                        if(!empty($columnItem['align'])) {
-                            $styleArray['alignment']['horizontal'] = $columnItem['align'];
+                        if(!empty($item['align'])) {
+                            $styleArray['alignment']['horizontal'] = $item['align'];
                         }
                         $styleArray && $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
                         $hyperlink && $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($hyperlink);
