@@ -1,19 +1,16 @@
 # exceler
-
 封装 phpspreadsheet 工具类
 
 ## 安装
-
 ```shell
 composer require ogenes/exceler
 ```
 
 ## 文档
 
-//超链接
+[wiki](https://github.com/ogenes/exceler/wiki)
 
 ## 简单读取
-
 ```php
     $config['sheet1'] = [
         'goodsName' => '商品名称',
@@ -26,7 +23,6 @@ composer require ogenes/exceler
 ```
 
 ## 简单导出
-
 ```php
         $data['sheet1'] = [
             ['goodsName' => '半裙', 'price' => 1490, 'actualStock' => 2,],
@@ -47,7 +43,6 @@ composer require ogenes/exceler
 ```
 
 ## 输出到浏览器
-
 ```php
     ExportClient::getInstance()
         ->setFilename('file' . date('His'))
@@ -135,6 +130,8 @@ data 中有一个预留字段 cellStyle ，用来定义单元格样式， 注意
 
 如果是超链接， 可在data 中指定value为数组， 数组包括 text 和 hyperlink 两个属性。
 
+如果该单元格有备注，也可在data 中指定value为数组， 数组包括 text 和 commnet 两个属性，备注赋给 comment。
+
 ```php
 $data['sheet1'] = [
   $row1,
@@ -186,7 +183,7 @@ $conf1 = [
     'alignment' => [],
     'fill' => [],
   ],
-  'format' => 'f',
+  'format' => 'General',
   'drawing' => [
     'name' => 'logo',
     'x' => 10,
@@ -196,6 +193,7 @@ $conf1 = [
   ]
 ]
 ```
+
 
 
 
