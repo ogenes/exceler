@@ -25,6 +25,46 @@ composer require ogenes/exceler
 ## DEMO
 
 ```php
+## 可以再次封装定义企业内的Excel固定模板，
+class ExcelHelper
+{
+    public static function export(array $data, array $config, string $filename): string
+    {
+        $client = ExportClient::getInstance();
+        $fill = [
+            'fillType' => Fill::FILL_GRADIENT_LINEAR,
+            'startColor' => [
+                'argb' => 'FFFE00',
+            ],
+            'endColor' => [
+                'argb' => 'FFFE00',
+            ]
+        ];
+        $client->setStyleHeaderFont([
+                'name' => '宋体',
+                'size' => 11,
+                'bold' => true,
+                'color' => ['argb' => '000000'],
+            ])
+            ->setStyleFont([
+                'name' => '宋体',
+                'size' => 10,
+                'color' => ['argb' => '000000'],
+            ])
+            ->setStyleHeaderFill($fill);
+        
+        $client->setFreezeHeader(true);
+       	return $client->setFilepath(storage_path('excel') . date('/Y/m/d/'))
+                ->setFilename($filename)
+                ->setData($data)
+                ->setConfig($config)
+                ->export();
+    }
+    
+}
+```
+
+```php
 ## 导出时定义好config即可。
 
 $data['sheet1'] = $list;
