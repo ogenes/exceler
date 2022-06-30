@@ -9,9 +9,11 @@
         "excel"
     ],
     "require": {
-        "php": "^7.0 || ^8.0",
+        "php": "^7.3 || ^8.0",
         "phpoffice/phpspreadsheet": "^1.23",
-        "ext-json": "*"
+        "ext-json": "*",
+        "cache/simple-cache-bridge": "^1.2",
+        "cache/redis-adapter": "1.1.x-dev"
     },
     "autoload": {
         "psr-4": {

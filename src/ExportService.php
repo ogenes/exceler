@@ -6,9 +6,13 @@
 
 namespace Ogenes\Exceler;
 
+use Cache\Adapter\Redis\RedisCachePool;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use PhpOffice\PhpSpreadsheet\Chart\Properties;
+use PhpOffice\PhpSpreadsheet\Settings;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Redis;
 
 class ExportService extends Base
 {
@@ -384,5 +388,26 @@ class ExportService extends Base
     public function getFilepath(): string
     {
         return $this->filepath;
+    }
+    
+    protected $protection = false;
+    
+    public function setProtection(bool $protection): self
+    {
+        $this->protection = $protection;
+        return $this;
+    }
+    
+    public function getProtection(): bool
+    {
+        return $this->protection;
+    }
+    
+    public function setRedis(Redis $redis): self
+    {
+        $pool = new RedisCachePool($redis);
+        $simpleCache = new SimpleCacheBridge($pool);
+        Settings::setCache($simpleCache);
+        return $this;
     }
 }

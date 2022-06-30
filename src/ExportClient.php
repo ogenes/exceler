@@ -173,8 +173,14 @@ class ExportClient extends ExportService
                     $styleArray['alignment']['horizontal'] = $columnItem['align'];
                 }
                 $styleArray && $sheet->getStyle($columnIndex . '1')->applyFromArray($styleArray);
-                $cellLength = $columnItem['width'] ?? $this->width;
-                $sheet->getColumnDimension($columnIndex)->setWidth($cellLength, $this->unit);
+                if (!empty($columnItem['width'])) {
+                    $sheet->getColumnDimension($columnIndex)
+                        ->setWidth($columnItem['width'], $this->unit);
+                } else {
+                    $sheet->getColumnDimension($columnIndex)
+                        ->setAutoSize(true)
+                        ->setWidth($this->width, $this->unit);
+                }
                 $columnIndex++;
             }
             $excel->createSheet();
@@ -202,6 +208,8 @@ class ExportClient extends ExportService
             $excel->setActiveSheetIndex($sheetIndex);
             $sheet = $excel->getActiveSheet();
             $this->freezeHeader && $sheet->freezePane('A2');
+            $this->getProtection() && $sheet->getProtection()->setSheet(true);
+            
             if (isset($sheetIndexMap[$sheetIndex])) {
                 $configKey = $sheetIndexMap[$sheetIndex];
                 $sheetConfig = $config[$configKey];
@@ -232,7 +240,7 @@ class ExportClient extends ExportService
                                 $item['bindKey']
                             );
                         } else {
-                            $text = '未找到的bindKey';
+                            $text = '';
                         }
                         if (isset($item['drawing'])) {
                             $img = new Drawing();
