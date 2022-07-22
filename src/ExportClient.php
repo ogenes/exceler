@@ -105,6 +105,11 @@ class ExportClient extends ExportService
         $filePath = $dir . '/' . $this->getFilename() . '.xlsx';
         $writer = IOFactory::createWriter($excel, 'Xlsx');
         $writer->save($filePath);
+        if ($this->cacheImgList) {
+            foreach ($this->cacheImgList as $item) {
+                @unlink($item);
+            }
+        }
         return $filePath;
     }
     
@@ -169,7 +174,7 @@ class ExportClient extends ExportService
                 $this->headerBorders && $styleArray['borders'] = $this->headerBorders;
                 $this->headerAlignment && $styleArray['alignment'] = $this->headerAlignment;
                 $this->headerFill && $styleArray['fill'] = $this->headerFill;
-                if(!empty($columnItem['align'])) {
+                if (!empty($columnItem['align'])) {
                     $styleArray['alignment']['horizontal'] = $columnItem['align'];
                 }
                 $styleArray && $sheet->getStyle($columnIndex . '1')->applyFromArray($styleArray);
@@ -217,6 +222,7 @@ class ExportClient extends ExportService
                 $maxColumn = 'A';
                 $maxRow = 2;
                 $columnMap = [];
+                $sheetData = $this->getImageArr($sheetData, $sheetConfig);
                 foreach ($sheetData as $row) {
                     $columnIndex = 'A';
                     foreach ($sheetConfig as $item) {
@@ -258,7 +264,7 @@ class ExportClient extends ExportService
                             $sheet->setCellValue($columnIndex . $rowIndex, $text);
                         }
                         $styleArray = $this->getContentStyle($item, $row['cellStyle'] ?? []);
-                        if(!empty($item['align'])) {
+                        if (!empty($item['align'])) {
                             $styleArray['alignment']['horizontal'] = $item['align'];
                         }
                         $styleArray && $sheet->getStyle($columnIndex . $rowIndex)->applyFromArray($styleArray);
@@ -312,6 +318,41 @@ class ExportClient extends ExportService
             $styleArray['numberFormat']['formatCode'] = $item['format'];
         }
         return $styleArray;
+    }
+    
+    /**
+     * @desc 从远程下载图片到本地
+     *
+     * @param array $sheetData
+     * @param array $sheetConfig
+     * @return array
+     *
+     * @author: ogenes <ogenes.yi@gmail.com>
+     * @date: 2022/7/23
+     */
+    protected function getImageArr(array $sheetData, array $sheetConfig): array
+    {
+        $request = $imgKeys = [];
+        foreach ($sheetConfig as $item) {
+            if (!empty($item['drawing']) && !empty($item['drawing']['remote'])) {
+                $imgKeys[] = $item['bindKey'];
+                foreach ($sheetData as $datum) {
+                    $url = $datum[$item['bindKey']] ?? '';
+                    $request[md5($url)]['url'] = $url;
+                }
+            }
+        }
+        if ($imgKeys && $request) {
+            $ret = DownloadClient::getInstance()->multiDownloadImg($request, $this->getFilepath());
+            foreach ($sheetData as $k => $item) {
+                foreach ($item as $kk => $vv) {
+                    if (in_array($kk, $imgKeys, true)) {
+                        $this->cacheImgList[] = $sheetData[$k][$kk] = $ret[md5($vv)] ?? '';
+                    }
+                }
+            }
+        }
+        return $sheetData;
     }
     
 }
