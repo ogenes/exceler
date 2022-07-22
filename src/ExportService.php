@@ -115,6 +115,12 @@ class ExportService extends Base
      */
     protected $filepath = './file/';
     
+    /**
+     * 从远程下载图片到本地，渲染完删除
+     * 
+     * @var array 
+     */
+    protected $cacheImgList = [];
     
     /**
      * @desc 设置字体
