@@ -248,7 +248,7 @@ class ExportClient extends ExportService
                         } else {
                             $text = '';
                         }
-                        if (isset($item['drawing'])) {
+                        if (isset($item['drawing']) && $text) {
                             $img = new Drawing();
                             $img->setName($item['drawing']['name'] ?? '');
                             $img->setDescription('');

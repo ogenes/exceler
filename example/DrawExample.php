@@ -19,7 +19,7 @@ class DrawExample
     {
         ini_set('memory_limit', '2KB');
         $data['sheet1'] = [
-            ['goodsName' => ['text' => '半裙', 'comment' => 'this is comment'], 'price' => 1490, 'actualStock' => 2, 'img' => 'https://static-legacy.dingtalk.com/media/lADPDg7mORo6b3zNAvDNAu4_750_752.jpg'],
+            ['goodsName' => ['text' => '半裙', 'comment' => 'this is comment'], 'price' => 1490, 'actualStock' => 2, 'img' => ''],
             ['goodsName' => '半裙1', 'price' => 1590, 'actualStock' => 1, 'img'=> 'https://static-legacy.dingtalk.com/media/lADPD3zUN8-C7xXNAzzNAzw_828_828.jpg'],
             ['goodsName' => '半裙', 'price' => 899, 'actualStock' => 2, 'img'=> 'https://static-legacy.dingtalk.com/media/lADPBbCc1reZWcPNAgPNAes_491_515.jpg'],
         ];
