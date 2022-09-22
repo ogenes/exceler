@@ -27,7 +27,7 @@ class ExcelClient extends Base
         try {
             $ext === 'xlsx' ?
                 $reader = IOFactory::createReader('Xlsx') :
-                $reader = IOFactory::createReaderForFile('Xls');
+                $reader = IOFactory::createReader('Xls');
             $reader->setReadDataOnly(true);  // 设置为只读
             $excel = $reader->load($filePath);
             foreach ($config as $name => $cells) {
