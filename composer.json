@@ -11,9 +11,7 @@
     "require": {
         "php": "^7.3 || ^8.0",
         "phpoffice/phpspreadsheet": "^1.23",
-        "ext-json": "*",
-        "cache/simple-cache-bridge": "^1.2",
-        "cache/redis-adapter": "1.1.x-dev"
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {
@@ -25,5 +23,6 @@
             "name": "ogenes",
             "email": "ogenes.yi@gmail.com"
         }
-    ]
+    ],
+    "minimum-stability": "dev"
 }

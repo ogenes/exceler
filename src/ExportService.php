@@ -408,12 +408,4 @@ class ExportService extends Base
     {
         return $this->protection;
     }
-    
-    public function setRedis(Redis $redis): self
-    {
-        $pool = new RedisCachePool($redis);
-        $simpleCache = new SimpleCacheBridge($pool);
-        Settings::setCache($simpleCache);
-        return $this;
-    }
 }

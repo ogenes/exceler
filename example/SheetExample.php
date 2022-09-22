@@ -40,9 +40,9 @@ class SheetExample
         
         $client = ExportClient::getInstance();
         
-        $redis = new Redis();
-        $redis->connect('redis');
-        $client->setRedis($redis);
+//        $redis = new Redis();
+//        $redis->connect('redis');
+//        $client->setRedis($redis);
         
         $client->setProtection(true);
         return $client->setFilepath(__DIR__ . '/file/' . date('Y/m/d/'))
