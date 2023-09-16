@@ -19,8 +19,11 @@ class ReadExample
             'price' => '售价',
             'actualStock' => '实际库存',
         ];
-        $filepath = __DIR__ . '/file/example.xlsx';
-        return ExcelClient::getInstance()->read($filepath, $config);
+//        $filepath = __DIR__ . '/file/example.xlsx';
+//        return ExcelClient::getInstance()->read($filepath, $config);
+        $fileUri= "http://oss-pub.ogenes.cn/example.xlsx";
+        return ExcelClient::getInstance()->readRemote($fileUri, $config);
+        
     }
 }
 

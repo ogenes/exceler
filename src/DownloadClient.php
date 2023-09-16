@@ -171,6 +171,27 @@ class DownloadClient
         echo fread($fp, $fSize);
         fclose($fp);
     }
+    
+    /**
+     * 远程文件下载
+     * @param $url
+     * @param $filepath
+     * @return string
+     * User: Ogenes
+     * Date: 2023/9/16
+     */
+    public function downloadFile($url, $filepath): string
+    {
+        if (empty($url) || empty($filepath)) {
+            return '';
+        }
+        $fp = fopen($filepath, 'w');
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_exec($ch);
+        curl_close($ch);
+        return $filepath;
+    }
 }
 
 

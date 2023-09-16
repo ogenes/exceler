@@ -92,6 +92,16 @@ class ExcelClient extends Base
         return $rowSet;
     }
     
+    public function readRemote(string $uri, array $config = null, $ext = null): array
+    {
+        empty($ext) && $ext = 'xlsx';
+        $tmpPath = "/tmp/" . md5($uri . uniqid('read_remote_', true)) . '.' . 'xlsx';
+        $filepath = DownloadClient::getInstance()->downloadFile($uri, $tmpPath);
+        $ret = $this->read($filepath, $config, $ext);
+        @unlink($filepath);
+        return $ret;
+    }
+    
     /**
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
