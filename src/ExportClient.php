@@ -16,6 +16,7 @@ class ExportClient extends ExportService
 {
     protected $config = [];
     protected $data = [];
+    protected $columnIndexMap = [];
     
     /**
      * @desc 请指定导出配置
@@ -143,6 +144,7 @@ class ExportClient extends ExportService
         
         $writer = IOFactory::createWriter($excel, 'Xlsx');
         $writer->save('php://output');
+        $this->columnIndexMap = [];
     }
     
     /**
@@ -186,6 +188,7 @@ class ExportClient extends ExportService
                         ->setAutoSize(true)
                         ->setWidth($this->width, $this->unit);
                 }
+                $this->columnIndexMap[$columnItem['bindKey']] = $columnIndex;
                 $columnIndex++;
             }
             $excel->createSheet();
@@ -221,7 +224,6 @@ class ExportClient extends ExportService
                 $rowIndex = 2;
                 $maxColumn = 'A';
                 $maxRow = 2;
-                $columnMap = [];
                 $sheetData = $this->getImageArr($sheetData, $sheetConfig);
                 foreach ($sheetData as $row) {
                     $columnIndex = 'A';
@@ -239,10 +241,10 @@ class ExportClient extends ExportService
                             $text = str_replace(
                                 array_map(static function ($key) {
                                     return "{{$key}}";
-                                }, array_keys($columnMap)),
+                                }, array_keys($this->columnIndexMap)),
                                 array_map(static function ($val) use ($rowIndex) {
                                     return "{$val}{$rowIndex}";
-                                }, $columnMap),
+                                }, $this->columnIndexMap),
                                 $item['bindKey']
                             );
                         } else {
@@ -271,7 +273,6 @@ class ExportClient extends ExportService
                         $hyperlink && $sheet->getCell($columnIndex . $rowIndex)->getHyperlink()->setUrl($hyperlink);
                         $comment && $sheet->getComment($columnIndex . $rowIndex)->getText()->createTextRun($comment);
                         $maxColumn = $columnIndex;
-                        $columnMap[$item['bindKey']] = $columnIndex;
                         $columnIndex++;
                     }
                     $maxRow = $rowIndex;
