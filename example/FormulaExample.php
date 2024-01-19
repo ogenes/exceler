@@ -22,8 +22,20 @@ class FormulaExample
           ['goodsName' => '半裙', 'price' => 1590, 'actualStock' => 1]
         ];
         
+        $data['sheet2'] = [
+          ['goodsName' => '半裙', 'cat' => 1, 'price' => 1490, 'actualStock' => 2],
+          ['goodsName' => '半裙', 'cat' => 2, 'price' => 1590, 'actualStock' => 1]
+        ];
+        
         $config['sheet1'] = [
           ['bindKey' => 'goodsName', 'columnName' => '商品名称'],
+          ['bindKey' => '={price}*{actualStock}', 'columnName' => '库存额'], //会自动转化为公式，所在行的 price * actualStock
+          ['bindKey' => 'price', 'columnName' => '售价'],
+          ['bindKey' => 'actualStock', 'columnName' => '实际库存'],
+        ];
+        $config['sheet2'] = [
+          ['bindKey' => 'goodsName', 'columnName' => '商品名称'],
+          ['bindKey' => 'cat', 'columnName' => '分类'],
           ['bindKey' => '={price}*{actualStock}', 'columnName' => '库存额'], //会自动转化为公式，所在行的 price * actualStock
           ['bindKey' => 'price', 'columnName' => '售价'],
           ['bindKey' => 'actualStock', 'columnName' => '实际库存'],
@@ -41,7 +53,7 @@ class FormulaExample
 
 
 try {
-    $filepath = (new CellExample())->run();
+    $filepath = (new FormulaExample())->run();
     print_r($filepath);
 } catch (\Exception $e) {
     print_r($e->getMessage());

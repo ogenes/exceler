@@ -188,7 +188,7 @@ class ExportClient extends ExportService
                         ->setAutoSize(true)
                         ->setWidth($this->width, $this->unit);
                 }
-                $this->columnIndexMap[$columnItem['bindKey']] = $columnIndex;
+                $this->columnIndexMap[$sheetName][$columnItem['bindKey']] = $columnIndex;
                 $columnIndex++;
             }
             $excel->createSheet();
@@ -212,7 +212,7 @@ class ExportClient extends ExportService
         $config = $this->getConfig();
         $data = $this->getData();
         $sheetIndex = 0;
-        foreach ($data as $sheetData) {
+        foreach ($data as $sheetName => $sheetData) {
             $excel->setActiveSheetIndex($sheetIndex);
             $sheet = $excel->getActiveSheet();
             $this->freezeHeader && $sheet->freezePane('A2');
@@ -241,10 +241,10 @@ class ExportClient extends ExportService
                             $text = str_replace(
                                 array_map(static function ($key) {
                                     return "{{$key}}";
-                                }, array_keys($this->columnIndexMap)),
+                                }, array_keys($this->columnIndexMap[$sheetName])),
                                 array_map(static function ($val) use ($rowIndex) {
                                     return "{$val}{$rowIndex}";
-                                }, $this->columnIndexMap),
+                                }, $this->columnIndexMap[$sheetName]),
                                 $item['bindKey']
                             );
                         } else {
